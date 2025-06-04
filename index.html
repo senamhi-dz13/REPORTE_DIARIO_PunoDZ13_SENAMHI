@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapa desde CSV</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+    .tooltip-normal {
+      font-size: 10px;
+      font-weight: normal;
+    }
+    .tooltip-destacado {
+      font-size: 15px;
+      font-weight: bold;
+      color: teal;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([-14.5, -69.5], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marcadores = [];
+
+    // Cargar CSV desde GitHub
+    fetch('https://raw.githubusercontent.com/tu_usuario/tu_repo/main/estaciones.csv')
+      .then(response => response.text())
+      .then(csv => {
+        const filas = csv.trim().split('\n').slice(1); // omitir encabezado
+        filas.forEach((linea, index) => {
+          const [nombre, lat, lon, temperatura] = linea.split(',');
+
+          const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);
+          const tooltip = `<div class="tooltip-normal">#${index + 1}<br>${nombre}</div>`;
+          marker.bindTooltip(tooltip, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'tooltip-normal'
+          }).openTooltip();
+
+          marcadores.push({
+            num: index + 1,
+            nombre: nombre,
+            lat: parseFloat(lat),
+            lon: parseFloat(lon),
+            temperatura: temperatura,
+            marker: marker
+          });
+
+          // Si es San Gaban, muestra imagen en popup
+          if (nombre === "San Gaban") {
+            const popupSanGaban = `
+              <div style="text-align:center;">
+                <strong>Reporte diario - San Gaban</strong><br>
+                <img src="https://raw.githubusercontent.com/senamhi-dz13/Reporte_diario-/refs/heads/main/ACORA.jpg" 
+                     alt="San Gaban" style="max-width:100%; height:auto; margin-top:5px;" />
+              </div>
+            `;
+            marker.bindPopup(popupSanGaban);
+          }
+        });
+      });
+
+    // Función distancia y búsqueda
+    function distancia(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function encontrarMasCercano(userLat, userLon) {
+      let minDist = Infinity;
+      let cercano = null;
+      marcadores.forEach(m => {
+        const d = distancia(userLat, userLon, m.lat, m.lon);
+        if (d < minDist) {
+          minDist = d;
+          cercano = m;
+        }
+      });
+      return cercano;
+    }
+
+    map.locate();
+    map.on('locationfound', e => {
+      L.circleMarker(e.latlng, {
+        radius: 8,
+        color: 'blue',
+        fillColor: '#30f',
+        fillOpacity: 0.6
+      }).addTo(map).bindTooltip("Tú", { permanent: true, direction: 'right' }).openTooltip();
+
+      const masCercano = encontrarMasCercano(e.latlng.lat, e.latlng.lng);
+      if (masCercano) {
+        map.setView([masCercano.lat, masCercano.lon], 12);
+        const contenidoGrande = `<div class="tooltip-destacado">#${masCercano.num}<br>${masCercano.nombre}<br>(Estación más cercana)</div>`;
+        masCercano.marker.unbindTooltip();
+        masCercano.marker.bindTooltip(contenidoGrande, {
+          permanent: true,
+          direction: 'top',
+          offset: [0, -10],
+          className: 'tooltip-destacado'
+        }).openTooltip();
+        masCercano.marker.setIcon(L.icon({
+          iconUrl: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32]
+        }));
+      }
+    });
+
+    map.on('locationerror', () => {
+      alert("No se pudo detectar tu ubicación.");
+    });
+  </script>
+</body>
+</html>
