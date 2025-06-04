@@ -20,7 +20,6 @@
 </head>
 <body>
   <div id="map"></div>
-
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([-14.5, -69.5], 8);
@@ -30,60 +29,52 @@
 
     const marcadores = [];
 
-    // Cargar CSV desde GitHub
-    fetch('https://raw.githubusercontent.com/senamhi-dz13/filecsv/main/reporte_diar.csv')  // formato RAW1!
+    fetch('https://raw.githubusercontent.com/senamhi-dz13/filecsv/main/reporte_diar.csv')
       .then(response => response.text())
       .then(csv => {
-        const filas = csv.trim().split('\n').slice(1); // omitir encabezado
+        const filas = csv.trim().split('\n').slice(1);
         filas.forEach((linea, index) => {
-          const [nombre, lat, lon, temp_max, temp_min, cielo] = linea.split(';');  // MODIF COLUMNAS  spli es el separador "," o";"
-          
-          const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);         // MODIF COLUMNAS
-          const tooltip = `
+          const [nombre, lat, lon, temp_max, temp_min, cielo] = linea.split(';');
+          const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);
+
+          const contenido = `
             <div class="tooltip-normal">
               #${index + 1}<br>
               ${nombre}<br>
               Temp_Max: ${temp_max} °C<br>
               Temp_Min: ${temp_min} °C<br>
               Cielo: ${cielo}
-              </div>
-           `;
-
-          marker.bindTooltip(tooltip, {
-            permanent: true,
-            direction: 'top',
-            offset: [0, -10],
-            className: 'tooltip-normal'
-          }).openTooltip();
+            </div>
+          `;
+          // Por defecto usar popup (no tooltip)
+          marker.bindPopup(contenido);
 
           marcadores.push({
             num: index + 1,
-            nombre: nombre,
+            nombre,
             lat: parseFloat(lat),
             lon: parseFloat(lon),
             temp_max,
             temp_min,
             cielo,
-            marker: marker
+            marker
           });
 
-          // Si es San Gaban, muestra imagen en popup  //LINEA 77 CAMBIAR LINK DE URL
           if (nombre === "Acora") {
-             const popup = `
-               <div style="text-align:center;">
-               <strong>San Gaban</strong><br>
-               Temp_Max: ${temp_max} °C<br>
-               Temp_Min: ${temp_min} °C<br>
-               Cielo: ${cielo}<br>
-               <img src="https://raw.githubusercontent.com/senamhi-dz13/Reporte_diario-/refs/heads/main/ACORA.jpg" style="max-width:100%; margin-top:5px;" />    
-             </div>
+            const popup = `
+              <div style="text-align:center;">
+              <strong>San Gaban</strong><br>
+              Temp_Max: ${temp_max} °C<br>
+              Temp_Min: ${temp_min} °C<br>
+              Cielo: ${cielo}<br>
+              <img src="https://raw.githubusercontent.com/senamhi-dz13/Reporte_diario-/refs/heads/main/ACORA.jpg" style="max-width:100%; margin-top:5px;" />    
+              </div>
             `;
             marker.bindPopup(popup);
           }
         });
       });
 
-    // Función distancia y búsqueda
     function distancia(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const φ1 = lat1 * Math.PI / 180;
@@ -120,14 +111,23 @@
       const masCercano = encontrarMasCercano(e.latlng.lat, e.latlng.lng);
       if (masCercano) {
         map.setView([masCercano.lat, masCercano.lon], 12);
-        const contenidoGrande = `<div class="tooltip-destacado">#${masCercano.num}<br>${masCercano.nombre}<br>(Estación más cercana)</div>`;
-        masCercano.marker.unbindTooltip();
+
+        const contenidoGrande = `
+          <div class="tooltip-destacado">
+            #${masCercano.num}<br>
+            ${masCercano.nombre}<br>
+            (Estación más cercana)
+          </div>
+        `;
+
+        masCercano.marker.unbindPopup();  // Eliminar popup anterior
         masCercano.marker.bindTooltip(contenidoGrande, {
           permanent: true,
           direction: 'top',
           offset: [0, -10],
           className: 'tooltip-destacado'
         }).openTooltip();
+
         masCercano.marker.setIcon(L.icon({
           iconUrl: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
           iconSize: [32, 32],
@@ -141,4 +141,4 @@
     });
   </script>
 </body>
-</html>
+
