@@ -138,8 +138,17 @@
           className: 'tooltip-destacado'
         }).openTooltip();
 
- 
-      }
+        // (Re)Asignar el popup completo
+        masCercano.marker.unbindPopup();
+        masCercano.marker.bindPopup(`
+          <div class="tooltip-normal">
+          ${masCercano.nombre}<br>
+          Temp_Max: ${masCercano.temp_max} °C<br>
+          Temp_Min: ${masCercano.temp_min} °C<br>
+          Cielo: ${masCercano.cielo}
+        </div>
+      `);
+     }   
     });
 
     map.on('locationerror', () => {
