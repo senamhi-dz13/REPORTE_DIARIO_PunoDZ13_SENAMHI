@@ -33,21 +33,29 @@
       .then(response => response.text())
       .then(csv => {
         const filas = csv.trim().split('\n').slice(1);
-        filas.forEach((linea, index) => {
+        filas.forEach((linea, index) => {                                    // desde aqui los fijos y los clickeable
           const [nombre, lat, lon, temp_max, temp_min, cielo] = linea.split(';');
           const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);
 
-          const contenido = `
+          // Tooltip SOLO con número de estación
+          const numeroTooltip = `#${index + 1}`;
+          marker.bindTooltip(numeroTooltip, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'tooltip-normal'
+          }).openTooltip();
+
+          // Popup completo
+          const popup = `
             <div class="tooltip-normal">
-              #${index + 1}<br>
               ${nombre}<br>
               Temp_Max: ${temp_max} °C<br>
               Temp_Min: ${temp_min} °C<br>
               Cielo: ${cielo}
             </div>
           `;
-          // Por defecto usar popup (no tooltip)
-          marker.bindPopup(contenido);
+          marker.bindPopup(popup);
 
           marcadores.push({
             num: index + 1,
@@ -72,7 +80,7 @@
             `;
             marker.bindPopup(popup);
           }
-        });
+        });               //fin fijos clickeacble
       });
 
     function distancia(lat1, lon1, lat2, lon2) {
@@ -119,8 +127,7 @@
             (Estación más cercana)
           </div>
         `;
-
-        masCercano.marker.unbindPopup();  // Eliminar popup anterior
+        masCercano.marker.unbindTooltip();
         masCercano.marker.bindTooltip(contenidoGrande, {
           permanent: true,
           direction: 'top',
@@ -132,7 +139,7 @@
           iconUrl: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
           iconSize: [32, 32],
           iconAnchor: [16, 32]
-        }));
+        }));  
       }
     });
 
