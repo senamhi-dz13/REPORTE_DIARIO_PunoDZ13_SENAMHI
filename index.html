@@ -36,7 +36,7 @@
       .then(csv => {
         const filas = csv.trim().split('\n').slice(1); // omitir encabezado
         filas.forEach((linea, index) => {
-          const [nombre, lat, lon, temp_max, temp_min, cielo] = line.split(';');  // MODIF COLUMNAS  spli es el separador "," o";"
+          const [nombre, lat, lon, temp_max, temp_min, cielo] = linea.split(';');  // MODIF COLUMNAS  spli es el separador "," o";"
           
           const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(map);         // MODIF COLUMNAS
           const tooltip = `
@@ -63,13 +63,13 @@
             lon: parseFloat(lon),
             temp_max,
             temp_min,
-            cielo
+            cielo,
             marker: marker
           });
 
           // Si es San Gaban, muestra imagen en popup  //LINEA 77 CAMBIAR LINK DE URL
           if (nombre === "Acora") {
-             marker.bindPopup(`
+             const popup = `
                <div style="text-align:center;">
                <strong>San Gaban</strong><br>
                Temp_Max: ${temp_max} °C<br>
@@ -78,7 +78,7 @@
                <img src="https://raw.githubusercontent.com/senamhi-dz13/Reporte_diario-/refs/heads/main/ACORA.jpg" style="max-width:100%; margin-top:5px;" />    
              </div>
             `;
-            marker.bindPopup(popupSanGaban);
+            marker.bindPopup(popup);
           }
         });
       });
