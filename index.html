@@ -124,10 +124,10 @@
           <div class="tooltip-destacado">
             #${masCercano.num}<br>
             ${masCercano.nombre}<br>
-            (Estación más cercana)
-            Temp_Max: ${temp_max} °C<br>
-            Temp_Min: ${temp_min} °C<br>
-            Cielo: ${cielo}
+            (Estación más cercana)<br>
+            Temp_Max: ${masCercano.temp_max} °C<br>
+            Temp_Min: ${masCercano.temp_min} °C<br>
+            Cielo: ${masCercano.cielo}
           </div>
         `;
         masCercano.marker.unbindTooltip();
