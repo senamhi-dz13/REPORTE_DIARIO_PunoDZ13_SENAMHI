@@ -71,7 +71,7 @@
           if (nombre === "Acora") {
             const popup = `
               <div style="text-align:center;">
-              <strong>San Gaban</strong><br>
+              <strong>Ácora</strong><br>
               Temp_Max: ${temp_max} °C<br>
               Temp_Min: ${temp_min} °C<br>
               Cielo: ${cielo}<br>
@@ -118,13 +118,16 @@
 
       const masCercano = encontrarMasCercano(e.latlng.lat, e.latlng.lng);
       if (masCercano) {
-        map.setView([masCercano.lat, masCercano.lon], 12);
+        map.setView([masCercano.lat, masCercano.lon], 9);
 
         const contenidoGrande = `
           <div class="tooltip-destacado">
             #${masCercano.num}<br>
             ${masCercano.nombre}<br>
             (Estación más cercana)
+            Temp_Max: ${temp_max} °C<br>
+            Temp_Min: ${temp_min} °C<br>
+            Cielo: ${cielo}
           </div>
         `;
         masCercano.marker.unbindTooltip();
