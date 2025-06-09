@@ -5,8 +5,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- 👇 AGREGADO: Ajustes generales para que el encabezado no sea tapado -->
   <style>
-    #map { height: 100vh; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    
+    /* 👇 CAMBIADO: antes decía height: 100vh; ahora se resta espacio del encabezado */
+    #map {
+      height: calc(100vh - 80px); /* Puedes ajustar los 80px si tu encabezado es más alto o más bajo */
+    }
+
     .tooltip-normal {
       font-size: 10px;
       font-weight: normal;
