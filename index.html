@@ -14,7 +14,7 @@
     .tooltip-destacado {
       font-size: 15px;
       font-weight: bold;
-      color: teal;
+      color: purple;
     }
   </style>
 </head>
@@ -50,9 +50,9 @@
           const popup = `
             <div class="tooltip-normal">
               ${nombre}<br>
-              Temp_Max: ${temp_max} °C<br>
-              Temp_Min: ${temp_min} °C<br>
-              Cielo: ${cielo}
+              Máxima temp. de ayer: ${temp_max} °C<br>
+              Mínima temp. de hoy : ${temp_min} °C<br>
+              Cielo de hoy 7am: ${cielo}
             </div>
           `;
           marker.bindPopup(popup);
@@ -67,19 +67,6 @@
             cielo,
             marker
           });
-
-          if (nombre === "Acora") {
-            const popup = `
-              <div style="text-align:center;">
-              <strong>Ácora</strong><br>
-              Temp_Max: ${temp_max} °C<br>
-              Temp_Min: ${temp_min} °C<br>
-              Cielo: ${cielo}<br>
-              <img src="https://raw.githubusercontent.com/senamhi-dz13/Reporte_diario-/refs/heads/main/ACORA.jpg" style="max-width:100%; margin-top:5px;" />    
-              </div>
-            `;
-            marker.bindPopup(popup);
-          }
         });               //fin fijos clickeacble
       });
 
@@ -143,9 +130,9 @@
         masCercano.marker.bindPopup(`
           <div class="tooltip-normal">
           ${masCercano.nombre}<br>
-          Temp_Max: ${masCercano.temp_max} °C<br>
-          Temp_Min: ${masCercano.temp_min} °C<br>
-          Cielo: ${masCercano.cielo}
+          Máxima temp. de ayer: ${masCercano.temp_max} °C<br>
+          Mínima temp. de hoy : ${masCercano.temp_min} °C<br>
+          Cielo de hoy 7am: ${masCercano.cielo}
         </div>
       `);
      }   
